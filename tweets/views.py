@@ -5,7 +5,14 @@ from .models import Tweet
 
 
 def home(request, *args, **kwargs):
-    return HttpResponse('hpme page')
+    return render(request, 'pages/home.html', context={})
+
+def tweet_list(request, *args, **kwargs):
+    qs = Tweet.objects.all()
+    tweets_list = [{"id": x.id, 'content': x.content} for x in qs]
+    data = {
+        'response': tweets_list
+    }
 
 
 def tweet_detail(request, tweet_id, *args, **kwargs):
@@ -19,6 +26,5 @@ def tweet_detail(request, tweet_id, *args, **kwargs):
     except:
         data['message'] = 'Not found'
         status = 404
-
 
     return JsonResponse(data, status=status)
