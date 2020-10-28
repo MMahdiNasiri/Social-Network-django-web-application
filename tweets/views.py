@@ -9,10 +9,11 @@ def home(request, *args, **kwargs):
 
 def tweet_list(request, *args, **kwargs):
     qs = Tweet.objects.all()
-    tweets_list = [{"id": x.id, 'content': x.content} for x in qs]
+    tweets_list = [{"id": x.id, 'content': x.content, 'likes': 12} for x in qs]
     data = {
         'response': tweets_list
     }
+    return JsonResponse(data)
 
 
 def tweet_detail(request, tweet_id, *args, **kwargs):
