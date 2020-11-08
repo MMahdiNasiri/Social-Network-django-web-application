@@ -67,6 +67,9 @@ function handleTweetCreateFormDidSubmit(event){
                     alert("an error has occurd");
                 }
             }
+        } else if (xhr.status === 401){
+            alert("you must login")
+            window.location.href = "/login"
         } else if (xhr.status === 500){
             console.log("server error")
         }
@@ -99,7 +102,7 @@ function loadTweets(tweetsElement) {
         xhr.onload = function(){
 
     const serverResponse = xhr.response
-    var listedItem = serverResponse.response
+    var listedItem = serverResponse
     var finalTweetStr = ""
     for(i=0; i<listedItem.length; i++){
         var tweetObj = listedItem[i]
