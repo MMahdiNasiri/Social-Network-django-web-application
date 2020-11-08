@@ -36,6 +36,21 @@ def tweet_detail(request, tweet_id):
     return Response(serializer.data)
 
 
+@api_view(['DELETE', 'POST'])
+@permission_classes([IsAuthenticated])
+def tweet_delete(request, tweet_id):
+    qs = Tweet.objects.filter(id=tweet_id)
+    if not qs.exists():
+        return Response({}, status=404)
+    qs = qs.filter(user=request.user)
+    if not qs.exists():
+        return Response({"message": "You can not delete this tweet"}, status=401)
+    obj = qs.first()
+    obj.delete()
+    return Response({"message": "Tweet removed"}, status=200)
+
+
+
 @api_view(['GET'])
 def tweet_list(request):
     qs = Tweet.objects.all()
