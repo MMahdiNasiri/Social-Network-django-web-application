@@ -28,10 +28,4 @@ class Tweet(models.Model):
     def is_retweet(self):
         return self.parent != None
 
-    def serialize(self):
-        return {
-            "id": self.id,
-            "content": self.content,
-            "likes": 0
-        }
 
