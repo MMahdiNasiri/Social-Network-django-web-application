@@ -1,0 +1,56 @@
+# Option 1
+'npx create-react-app <your-app-name>'
+>If fails, try: 'npm -g uninstall create-react-app' then 'npx
+create-react-app <your-app-name>'
+
+# Option 2
+'npm init react-app <your-app-name>'
+
+# Option 3
+'package.json':
+'''
+{
+  "name": "your-app-name",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.1.2",
+    "@testing-library/user-event": "^12.2.2",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.0",
+    "web-vitals": "^0.2.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
+'''
+Then 'npm install'
+
+# Option 4 (using yarm)
+'''
+yarn create react-app my-app
+'''
