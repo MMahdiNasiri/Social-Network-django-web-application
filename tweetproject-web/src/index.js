@@ -6,9 +6,11 @@ import {TweetsComponent} from './tweets';
 import reportWebVitals from './reportWebVitals';
 
 
+
+const e = React.createElement
 const tweetsEl = document.getElementById("tweets");
 if (tweetsEl){
-    ReactDOM.render(<TweetsComponent />, tweetsEl);
+    ReactDOM.render(e(TweetsComponent, tweetsEl.dataset) , tweetsEl);
 }
 
 //ReactDOM.render(
