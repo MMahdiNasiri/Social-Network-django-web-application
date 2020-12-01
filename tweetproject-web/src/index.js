@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import {TweetsComponent} from './tweets';
+import {TweetsComponent, TweetDetailComponent} from './tweets';
 import reportWebVitals from './reportWebVitals';
 
 
@@ -12,6 +12,14 @@ const tweetsEl = document.getElementById("tweets");
 if (tweetsEl){
     ReactDOM.render(e(TweetsComponent, tweetsEl.dataset) , tweetsEl);
 }
+
+const tweetDetailElements = document.querySelectorAll(".tweets-detail")
+
+tweetDetailElements.forEach(container=>{
+    ReactDOM.render(
+    e(TweetDetailComponent, container.dataset),
+    container);
+})
 
 //ReactDOM.render(
 //  <React.StrictMode>

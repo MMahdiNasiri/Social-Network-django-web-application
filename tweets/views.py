@@ -17,7 +17,24 @@ from .serializers import (
 
 
 def home(request, *args, **kwargs):
-    return render(request, 'pages/home.html', context={})
+    username = None
+    if request.user.is_authenticated:
+        username = request.user.username
+    return render(request, 'pages/home.html', context={"username": username})
+
+
+def local_tweets_list_view(request, *args, **kwargs):
+    return render(request, 'tweets/list.html')
+
+def local_tweets_detail_view(request, tweet_id, *args, **kwargs):
+    return render(request, 'tweets/detail.html', context={"tweet_id": tweet_id})
+
+
+def local_tweets_profile_view(request, username, *args, **kwargs):
+    return render(request, 'tweets/profile.html', context={"profile_username": username})
+
+
+
 
 
 @api_view(['POST'])
@@ -99,50 +116,50 @@ def tweet_list(request):
     return Response(serializer.data)
 
 
-def tweet_create_view_pure_django(request, *args, **kwargs):
-    user = request.user
-    if not request.user.is_authenticated:
-        user = None
-        if request.is_ajax():
-            return JsonResponse({}, status=401)
-        return redirect(settings.Login_URL)
-    form = TweetForm(request.POST or None)
-    next_url = request.POST.get("next") or None
-    if form.is_valid():
-        obj = form.save(commit=False)
-        obj.user = user
-        obj.save()
-        if request.is_ajax():
-            return JsonResponse(obj.serialize(), status=201)
-
-        if next_url is not None:
-            return redirect(next_url)
-        form = TweetForm()
-    if form.errors:
-        if request.is_ajax():
-            return JsonResponse(form.errors, status=400)
-    return render(request, 'components/form.html', context={"form": form})
-
-
-def tweet_list_pure_django(request, *args, **kwargs):
-    qs = Tweet.objects.all()
-    tweets_list = [x.serialize() for x in qs]
-    data = {
-        'response': tweets_list
-    }
-    return JsonResponse(data)
+# def tweet_create_view_pure_django(request, *args, **kwargs):
+#     user = request.user
+#     if not request.user.is_authenticated:
+#         user = None
+#         if request.is_ajax():
+#             return JsonResponse({}, status=401)
+#         return redirect(settings.Login_URL)
+#     form = TweetForm(request.POST or None)
+#     next_url = request.POST.get("next") or None
+#     if form.is_valid():
+#         obj = form.save(commit=False)
+#         obj.user = user
+#         obj.save()
+#         if request.is_ajax():
+#             return JsonResponse(obj.serialize(), status=201)
+#
+#         if next_url is not None:
+#             return redirect(next_url)
+#         form = TweetForm()
+#     if form.errors:
+#         if request.is_ajax():
+#             return JsonResponse(form.errors, status=400)
+#     return render(request, 'components/form.html', context={"form": form})
 
 
-def tweet_detail_pure_django(request, tweet_id, *args, **kwargs):
-    data = {
-        'id': tweet_id,
-    }
-    status = 200
-    try:
-        obj = Tweet.objects.get(id=tweet_id)
-        data['content'] = obj.content
-    except:
-        data['message'] = 'Not found'
-        status = 404
+# def tweet_list_pure_django(request, *args, **kwargs):
+#     qs = Tweet.objects.all()
+#     tweets_list = [x.serialize() for x in qs]
+#     data = {
+#         'response': tweets_list
+#     }
+#     return JsonResponse(data)
 
-    return JsonResponse(data, status=status)
+
+# def tweet_detail_pure_django(request, tweet_id, *args, **kwargs):
+#     data = {
+#         'id': tweet_id,
+#     }
+#     status = 200
+#     try:
+#         obj = Tweet.objects.get(id=tweet_id)
+#         data['content'] = obj.content
+#     except:
+#         data['message'] = 'Not found'
+#         status = 404
+#
+#     return JsonResponse(data, status=status)
