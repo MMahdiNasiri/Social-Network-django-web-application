@@ -40,12 +40,11 @@ export function backendLookup(method, endpoint, callback, data){
             if(detail === "Authentication credentials were not provided."){
                 window.location.href = '/login?showLoginRequired=true'
             }
-
         }
         callback(xhr.response, xhr.status)
     }
     xhr.onerror = function (e) {
-        callback({"message": "the rrequest err"}, 400)
+        callback({"message": "the request err"}, 400)
     }
     xhr.send(jsonData)
 }

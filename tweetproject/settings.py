@@ -34,6 +34,7 @@ MAX_TWEET_LENGTH = 240
 INSTALLED_APPS = [
     # 'tweets',
     'tweets.apps.TweetsConfig',
+    'accounts.apps.AccountsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
