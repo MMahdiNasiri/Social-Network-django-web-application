@@ -33,6 +33,7 @@ MAX_TWEET_LENGTH = 240
 
 INSTALLED_APPS = [
     # 'tweets',
+    'profiles.apps.ProfilesConfig',
     'tweets.apps.TweetsConfig',
     'accounts.apps.AccountsConfig',
     'django.contrib.admin',
