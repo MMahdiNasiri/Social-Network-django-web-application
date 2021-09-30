@@ -1,0 +1,80 @@
+{% load static %}
+<!doctype html>
+<html lang="en" dir="rtl">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000"/>
+    <script src="{% static 'fontawesome/fontawesome.js' %}"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.rtl.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom-css.css' %}">
+
+    <style>
+        ul.errorlist {
+            display:none;
+        }
+        .custom-nav {
+            background-image: linear-gradient(to right, #c9e0d9, #0dd4c9);
+        }
+        body{
+            background-image: linear-gradient(to right, #f6f4e5 , #f5f5f5);
+        }
+        a{
+            color: #1a1e21;
+            text-decoration: none;
+        }
+
+    </style>
+    <title>social</title>
+</head>
+<body>
+{% if request.user.is_staff %}
+    <div class="col-2 h-100 bg-dark position-fixed link-light d-none d-sm-block">
+        <ul class="mt-5 navbar-nav ms-3">
+            <li class="nav-item mt-5">
+                <a class="link-light {% block posts %}{% endblock %}" href="{% url 'control-posts' %}">پست ها</a>
+            </li>
+            <li class="nav-item mt-2">
+                <a class="link-light {% block comments %}{% endblock %}" href="{% url 'control-comments' %}">نظرات</a>
+            </li>
+            <li class="nav-item mt-2">
+                <a class="link-light {% block users %}{% endblock %}" href="{% url 'control-users' %}">کاربران</a>
+            </li>
+        </ul>
+    </div>
+{% endif %}
+<nav class="navbar navbar-expand-lg navbar-light custom-nav sticky-top">
+    <a class="navbar-brand ms-4 me-4" href="{% url 'last-posts' %}">لیمو</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li>
+                <a class="nav-link" href="{% url 'last-posts' %}">بازگشت به صفحه اصلی</a>
+            </li>
+            {% if request.user.is_staff %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">خروج</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+<div>
+<div>
+
+<div class="container col-10 mt-4">
+    {% block content %}
+    {% endblock content %}
+</div>
+</div>
+<script src="/static/js/getCookie.js"></script>
+{% block js %}
+{% endblock js %}
+</body>
+</html>
+

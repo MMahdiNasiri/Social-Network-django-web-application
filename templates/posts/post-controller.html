@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row col-9" id="posts">
+        {% for post in posts %}
+            {% if post.parent %}
+                <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 bg-white carousel slide' id='post-{{ post.id }}'>
+                    <img class="rounded-circle article-img avatar" src="{{ post.profile_img }}" alt="">
+                    {% if post.name %}
+                        <h5><a href="{% url 'profile' post.username %}">{{ post.name }}</a></h5>
+                    {% endif %}
+                    <em dir="ltr"><a href="{% url 'profile' post.username %}">@{{ post.username }}</a></em>
+                    <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide' id='post-{{ post.parent.id }}'>
+                        <img class="rounded-circle article-img avatar" src="{{ post.parent.profile_img }}" alt="">
+                        {% if post.parent.name %}
+                            <h5><a href="{% url 'profile' post.parent.username %}">{{ post.parent.name }}</a></h5>
+                        {% endif %}
+                        <em dir="ltr"><a href="{% url 'profile' post.parent.username %}">@{{ post.parent.username }}</a></em>
+                        <p>{{ post.parent.content }}</p>
+                        {% if post.parent.post_img %}
+                            <img src="{{ post.parent.post_img }}" alt="" style="width: inherit; max-height: 300px">
+                        {% endif %}
+                        <a href="{% url 'detail-post' post.parent.id %}" class="bg-success carousel-control-next fa fa-angle-left" style="font-size:32px; width: 10%;"></a>
+                    </div>
+                    <p class='btn-group'>
+                        <button class='btn btn-primary btn-sm' onclick='handleLikeBtn({{ post.id }})'>
+                            <span class='fa fa-thumbs-up'></span>
+                            <span id='postlike-{{ post.id }}'>{{ post.likes }}</span>
+                        </button>
+                        <button class='btn btn-primary btn-sm' onclick='handleRepublishBtn({{ post.id }})'>
+                            <span class='fa fa-retweet'></span>
+                        </button>
+                        <button class='btn btn-primary btn-sm' onclick='handleRepublishBtn({{ post.id }})'>
+                            <span class='fas fa-comment-dots'></span>
+                        </button>
+                    </p>
+                    <a href="{% url 'detail-post' post.id %}" class="bg-success carousel-control-next fa fa-angle-left" style="font-size:32px; width: 10%;"></a>
+                </div>
+            {% else %}
+                <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide' id='post-{{ post.id }}'>
+                    <img class="rounded-circle article-img avatar" src="{{ post.profile_img }}" alt="">
+                    {% if post.name %}
+                        <h5><a href="{% url 'profile' post.username %}">{{ post.name }}</a></h5>
+                    {% endif %}
+                    <em dir="ltr"><a href="{% url 'profile' post.username %}">@{{ post.username }}</a></em>
+                    <p>{{ post.content }}</p>
+                    {% if post.post_img %}
+                        <img src="{{ post.post_img }}" alt="" style="width: inherit; max-height: 300px">
+                    {% endif %}
+                    <p class="btn-group">
+                        <button class='btn btn-primary btn-sm' onclick="handleLikeBtn({{ post.id }})">
+                            <span class="fa fa-thumbs-up"></span>
+                            <span id="postlike-{{ post.id }}">{{ post.likes }}</span>
+                        </button>
+                        <button class='btn btn-primary btn-sm' onclick="handleRepublishBtn({{ post.id }})">
+                            <span class="fa fa-retweet"></span>
+                        </button>
+                        <button class='btn btn-primary btn-sm'>
+                            <span class='fas fa-comment-dots'></span>
+                        </button>
+                    </p>
+                    <a href="{% url 'detail-post' post.id %}" class="bg-success carousel-control-next fa fa-angle-left" style="font-size:32px; width: 10%;" ></a>
+                </div>
+
+            {% endif %}
+        {% endfor %}
+    </div>
+
+{% endblock %}
+{% block js %}
+
+{% endblock %}

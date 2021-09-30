@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block profile %}
+{% if target_user == user %}active{% endif %}
+{% endblock %}
+
+{% block header %}
+<div class="row col-5 mx-auto mt-4 bg-profile">
+
+    <div class="col-12">
+        <img class="rounded-circle article-img profile-avatar" src="{{ profile.profileImage.url }}" alt="">
+    </div>
+    <div class="col-6" style="float: right">
+    <em id="username" dir="ltr" >@{{ target_user.username }}</em>
+    {% if target_user.first_name %}
+        <h5>{{ target_user.get_full_name }}</h5>
+    {% endif %}
+
+    {% if profile.location is not None %}
+        <h5>موقعیت: {{ profile.location }}</h5>
+    {% endif %}
+    </div>
+    <div class="col-6" style="float: left;">
+    <h5 id="followers">{{ profile.followers.count }} دنبال کننده</h5>
+    <h5>{{ target_user.following.count }} دنبال شونده</h5>
+    </div>
+    {% if profile.bio is not None %}
+        <p>{{ profile.bio }}</p>
+    {% endif %}
+    {% if target_user != request.user %}
+        <div id="followBtn" >
+            {% if is_following %}
+                <button class="btn btn-outline-secondary" onclick="followHandler(true)">توقف پیروی</button>
+            {% else %}
+                <button class="btn btn-success" onclick="followHandler(false)">دنبال کردن</button>
+            {% endif %}
+        </div>
+    {% endif %}
+    <p> </p>
+
+</div>
+{% endblock %}
+
+{% block content %}
+    <div class="row mt-3" id="posts">
+        {% for post in posts %}
+            {% if post.parent %}
+                <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide post' id='post-{{ post.id }}'>
+                    <img class="rounded-circle article-img avatar" src="{{ post.profile_img }}" alt="">
+                    <h5><a href="{% url 'profile' post.username %}">{{ post.name }}</a></h5>
+                    <em dir="ltr"><a href="{% url 'profile' post.username %}">@{{ post.username }}</a></em>
+                    <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide' id='post-{{ post.parent.id }}'>
+                        <img class="rounded-circle article-img avatar" src="{{ post.parent.profile_img }}" alt="">
+                        <h5><a href="{% url 'profile' post.parent.username %}">{{ post.parent.name }}</a></h5>
+                        <em dir="ltr"><a href="{% url 'profile' post.parent.username %}">@{{ post.parent.username }}</a></em>
+                        <div class="ms-2 mt-4">
+                            <p>{{ post.parent.content|linebreaks }}</p>
+                        </div>
+                        {% if post.parent.post_img %}
+                            <img src="{{ post.parent.post_img }}" alt="" style="width: inherit; max-height: 300px">
+                        {% endif %}
+                        <a href="{% url 'detail-post' post.parent.id %}" class="next carousel-control-next fa fa-angle-left"></a>
+                    </div>
+                    <div class="col-12">
+                        <p class='btn-group mt-1'>
+                            <button class='btn btn-primary btn-sm' onclick='handleLikeBtn({{ post.id }})'>
+                                <span class='fa fa-thumbs-up'></span>
+                                <span id='postlike-{{ post.id }}'>{{ post.likes }}</span>
+                            </button>
+                            <button class='btn btn-primary btn-sm' onclick='handleRepublishBtn({{ post.id }})'>
+                                <span class='fa fa-retweet'></span>
+                            </button>
+                        </p>
+                        <a href="{% url 'detail-post' post.id %}" class="next carousel-control-next fa fa-angle-left"></a>
+                    </div>
+                </div>
+            {% else %}
+                <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide post' id='post-{{ post.id }}'>
+                    <img class="rounded-circle article-img avatar" src="{{ post.profile_img }}" alt="">
+                    <h5><a href="{% url 'profile' post.username %}">{{ post.name }}</a></h5>
+                    <em dir="ltr"><a href="{% url 'profile' post.username %}">@{{ post.username }}</a></em>
+                    <div class="ms-2 mt-4">
+                        <p>{{ post.content|linebreaks }}</p>
+                    </div>
+                    {% if post.post_img %}
+                        <img src="{{ post.post_img }}" alt="" style="width: inherit; max-height: 300px">
+                    {% endif %}
+                    <div class="col-12">
+                        <p class="btn-group mt-1">
+                            <button class='btn btn-primary btn-sm' onclick="handleLikeBtn({{ post.id }})">
+                                <span class="fa fa-thumbs-up"></span>
+                                <span id="postlike-{{ post.id }}">{{ post.likes }}</span>
+                            </button>
+                            <button class='btn btn-primary btn-sm' onclick="handleRepublishBtn({{ post.id }})">
+                                <span class="fa fa-retweet"></span>
+                            </button>
+                        </p>
+                    </div>
+                    <a href="{% url 'detail-post' post.id %}" class="next carousel-control-next fa fa-angle-left"></a>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/getCookie.js"></script>
+    <script src="/static/js/followHandler.js"></script>
+    <script src="/static/js/postHandler.js"></script>
+
+{% endblock js %}

@@ -1,0 +1,20 @@
+{% extends "staff-base.html" %}
+{% block content %}
+    <div class="content-section row">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mx-auto"><p class="align-middle ml-2">{{ message }}</p></div>
+            {% endfor %}
+        {% endif %}
+        <form method="POST" class="col-sm-auto" autocomplete="off">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">ورود</legend>
+                {{ form }}
+            </fieldset>
+            <div class="form-group my-3">
+                <button class="btn btn-outline-info" type="submit">ورود</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

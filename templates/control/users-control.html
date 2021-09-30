@@ -1,0 +1,93 @@
+{% extends "staff-base.html" %}
+
+{% block users %}ps-4{% endblock %}
+
+{% block content %}
+    <div class="col-8 mx-auto">
+        <figure class="highcharts-figure">
+            <div id="figure-container"></div>
+        </figure>
+        {% for user_obj in page_obj %}
+            <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 post' id='user-{{ user_obj.id }}'>
+                <img class="rounded-circle article-img avatar" src="{{ user_obj.profileImage.url }}" alt="">
+                {% if user_obj.user.get_full_name %}
+                    <h5>{{ user_obj.user.get_full_name }}</h5>
+                {% endif %}
+                <em dir="ltr">@{{ user_obj.user.username }}</em>
+                {% if user_obj.location %}
+                    <div class="ms-4">
+                        <p>{{ user_obj.location }}</p>
+                    </div>
+                {% endif %}
+                {% if user_obj.bio %}
+                    <div class="ms-4">
+                        <p>{{ user_obj.bio }}</p>
+                    </div>
+                {% endif %}
+                <p id="button-{{ user_obj.id }}">
+                    <button class='btn btn-outline-danger btn-sm ms-3 mt-2' onclick="handleDeleteBtn({{ user_obj.id }}, 'user')">حذف</button>
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="navbar-nav pagination mx-auto mb-5">
+        <ul class="mx-auto navbar" style="list-style-type: none;">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link">قبلی</a></li>
+            {% else %}
+                <li class="page-item disabled"><a href="#" class="page-link">قبلی</a></li>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link">بعدی</a></li>
+            {% else %}
+                <li class="page-item disabled"><a href="#" class="page-link">بعدی</a></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/highcharts/highcharts.js"></script>
+    <script src="/static/js/deleteHandler.js"></script>
+    {{ top_users|json_script:"js-data" }}
+    <script>
+        const jsvalue = JSON.parse(document.getElementById('js-data').textContent);
+        Highcharts.chart('figure-container', {
+            chart: {
+                type: 'column',
+                height: 300,
+                shadow: {
+                    color: '#55ffbb',
+                    width: 10,
+                    offsetX: 18,
+                    offsetY: 2
+                }
+            },
+            title: {
+                text: 'کاربران فعال'
+            },
+            xAxis: {
+                categories: jsvalue,
+            },
+            yAxis:{
+                title: {
+                    text: ' منتشره'
+                }
+            },
+            series: [{
+                name: 'پست ها',
+                data: {{ post_count }}
+            },
+            {
+                name: 'نظرات',
+                data: {{ comment_count }}
+            }],
+            credits: {
+                enabled: false
+            },
+
+        });
+
+
+    </script>
+{% endblock %}

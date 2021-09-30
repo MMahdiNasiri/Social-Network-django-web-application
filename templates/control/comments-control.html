@@ -1,0 +1,79 @@
+{% extends "staff-base.html" %}
+
+{% block comments %}ps-4{% endblock %}
+{% block content %}
+    <div class="col-8 mx-auto">
+        <figure class="highcharts-figure">
+            <div id="figure-container"></div>
+        </figure>
+        <div class="row" id="comments">
+            {% for comment in page_obj %}
+                <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 bg-white' id="comment-{{ comment.id }}">
+                    <em dir="ltr"><a href="{% url 'profile' comment.username %}">@{{ comment.username }}</a></em>
+                    <span>{{ comment.comment }}</span>
+                    <p id="button-{{ comment.id }}">
+                        <button class='btn btn-outline-danger btn-sm ms-3 mt-2' onclick="handleDeleteBtn({{ comment.id }}, 'comment')">حذف</button>
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="navbar-nav pagination mx-auto mb-5">
+        <ul class="mx-auto navbar" style="list-style-type: none;">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link">قبلی</a></li>
+            {% else %}
+                <li class="page-item disabled"><a href="#" class="page-link">قبلی</a></li>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link">بعدی</a></li>
+            {% else %}
+                <li class="page-item disabled"><a href="#" class="page-link">بعدی</a></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/highcharts/highcharts.js"></script>
+    {{ top_users|json_script:"js-data" }}
+    <script src="/static/js/deleteHandler.js"></script>
+    <script>
+        const jsvalue = JSON.parse(document.getElementById('js-data').textContent);
+        Highcharts.chart('figure-container', {
+            chart: {
+                type: 'column',
+                height: 300,
+                shadow: {
+                    color: '#55ffbb',
+                    width: 10,
+                    offsetX: 18,
+                    offsetY: 2
+                }
+            },
+            title: {
+                text: 'کاربران فعال'
+            },
+            subtitle:{
+                text: 'کاربران با بیشترین نظر'
+            },
+            xAxis: {
+                categories: jsvalue,
+            },
+            yAxis:{
+                title: {
+                    text: 'تعداد نظرات'
+                }
+            },
+            series: [{
+                name: 'نظرات',
+                data: {{ count }}
+            }],
+            credits: {
+                enabled: false
+            },
+
+        });
+
+    </script>
+{% endblock %}

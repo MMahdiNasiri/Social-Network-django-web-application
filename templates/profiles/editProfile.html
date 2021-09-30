@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block profile-update %}active{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div id="proimage">
+            <img class="rounded-circle article-img avatar pointer"  src="{{ image }}" alt="" onclick="image_clicked()">
+        </div>
+        <input type="file" id="profileimginput" name="img" accept="image/*" class="d-none" onchange="upload_image()">
+        <form method="post" class="col-6">
+            {% csrf_token %}
+            {{ user_form.as_p }}
+            {{ profile_form.as_p }}
+            <button class="btn btn-outline-info col-2" type="submit">تغییر</button>
+        </form>
+    </div>
+{% endblock content %}
+{% block js %}
+    <script src="/static/js/getCookie.js"></script>
+    <script src="/static/js/imageProfileHandler.js"></script>
+{% endblock %}

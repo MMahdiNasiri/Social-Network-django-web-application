@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% if post.parent %}
+    <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide post' id='post-{{ post.id }}'>
+        <img class="rounded-circle article-img avatar" src="{{ post.profile_img }}" alt="">
+            <h5><a href="{% url 'profile' post.username %}">{{ post.name }}</a></h5>
+        <em dir="ltr"><a href="{% url 'profile' post.username %}">@{{ post.username }}</a></em>
+        <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide' id='post-{{ post.parent.id }}'>
+            <img class="rounded-circle article-img avatar" src="{{ post.parent.profile_img }}" alt="">
+            <h5><a href="{% url 'profile' post.parent.username %}">{{ post.parent.name }}</a></h5>
+            <em dir="ltr"><a href="{% url 'profile' post.parent.username %}">@{{ post.parent.username }}</a></em>
+            <div class="ms-2 mt-4">
+                <p>{{ post.parent.content|linebreaks }}</p>
+            </div>
+            {% if post.parent.post_img %}
+                <img src="{{ post.parent.post_img }}" alt="" style="width: inherit; max-height: 300px">
+            {% endif %}
+            <a href="{% url 'detail-post' post.parent.id %}" class="next carousel-control-next fa fa-angle-left"></a>
+        </div>
+        <p class='ms-sm-5'>
+            <button class='btn btn-primary btn-sm' onclick='handleLikeBtn({{ post.id }})'>
+                <span class='fa fa-thumbs-up'></span>
+                <span id='postlike-{{ post.id }}'>{{ post.likes }}</span>
+            </button>
+{#            <button class='btn btn-primary btn-sm' onclick='handleRepublishBtn({{ post.id }})'>#}
+{#                <span class='fa fa-retweet'></span>#}
+{#            </button>#}
+        </p>
+    </div>
+{% else %}
+    <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide post' id='post-{{ post.id }}'>
+        <img class="rounded-circle article-img avatar" src="{{ post.profile_img }}" alt="">
+            <h5><a href="{% url 'profile' post.username %}">{{ post.name }}</a></h5>
+        <em dir="ltr"><a href="{% url 'profile' post.username %}">@{{ post.username }}</a></em>
+        <div class="ms-3">
+            <p>{{ post.content|linebreaks }}</p>
+        </div>
+        {% if post.post_img %}
+            <img src="{{ post.post_img }}" alt="" style="width: inherit; max-height: 300px">
+        {% endif %}
+        <p class="ms-sm-5">
+            <button class='btn btn-primary btn-sm' onclick="handleLikeBtn({{ post.id }})">
+                <span class="fa fa-thumbs-up"></span>
+                <span id="postlike-{{ post.id }}">{{ post.likes }}</span>
+            </button>
+{#            <button class='btn btn-primary btn-sm' onclick="handleRepublishBtn({{ post.id }})">#}
+{#                <span class="fa fa-retweet"></span>#}
+{#            </button>#}
+        </p>
+    </div>
+
+{% endif %}
+<div class="mx-auto col-10">
+    <form class="form" id="comment-create-form" method="POST" action="comment">
+        {% csrf_token %}
+        <div class="d-none alert alert-danger" id="post-create-form-error"></div>
+        <textarea required="required" class="form-control" name="content" placeholder="نظر شما"></textarea>
+        <button type="submit" class="btn btn-primary ms-2 mt-2 mb-3" >ارسال نظر</button>
+    </form>
+</div>
+
+
+
+<div class="row" id="comments">
+    {% for comment in comments %}
+            <div class='col-12 col-md-10 mx-auto border border-3 rounded py-3 mb-4 bg-white'>
+                <em dir="ltr"><a href="{% url 'profile' comment.username %}">@{{ comment.username }}</a></em>
+                <span>{{ comment.comment }}</span>
+            </div>
+    {% endfor %}
+</div>
+
+
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function formatComment(content, username){
+    const userInfo = '<em dir="ltr"><a href="' + username + '/profiles">@' + username + '</a></em>'
+    const comment = '<span>' + content + '</span>'
+    const result =  '<div class="col-12 col-md-10 mx-auto border border-3 rounded py-3 mb-4 bg-white">' + userInfo + comment + '</div>'
+    return result
+}
+
+
+const commentsContainerElement = document.getElementById("comments")
+
+
+function handleCreateComment(event){
+    event.preventDefault()
+    const csrftoken = getCookie('csrftoken');
+    const myForm = event.target
+    const myFormData = new FormData(myForm)
+    const content = myFormData.get("content")
+    const post_id = {{ post.id }}
+    const data = {
+        'content': content,
+        'post_id': post_id
+    }
+    fetch('create-comment', {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+            "Content-type": "application/json; charset=UTF-8",
+            'X-CSRFToken': csrftoken,
+        },
+        dataType: 'json'
+    }).then(response => response.json())
+        .then(response =>{
+            const rescontent = response.comment
+            const username = response.username
+            const newCommentElement = formatComment(rescontent, username)
+            const ogHtml = commentsContainerElement.innerHTML
+            commentsContainerElement.innerHTML = newCommentElement + ogHtml
+            myForm.reset()
+        }).catch(error => window.location.replace("/accounts/login/"));
+}
+
+const commentCreateFormEl = document.getElementById("comment-create-form");
+commentCreateFormEl.addEventListener("submit", handleCreateComment);
+
+
+</script>
+
+<script src="/static/js/getCookie.js"></script>
+<script src="/static/js/postHandler.js"></script>
+
+
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+
+{% block home %}
+    {% if type == 'home' %}active{% endif %}
+{% endblock %}
+{% block last_post %}
+    {% if type == 'last_posts' %}active{% endif %}
+{% endblock %}
+
+
+{% block header %}
+{% if type == 'home' %}
+    <div id="create-post">
+    <div class="container pt-2 pb-2">
+        <div class="row col-7 col-sm mt-3 mx-auto">
+            <div class="mx-auto col-10">
+                <form class="form" id="post-create-form" method="POST" action="create-post">
+                    {% csrf_token %}
+                    <textarea id="id_content" required="required" class="form-control" name="content" placeholder="Your content"></textarea>
+                    <div class="file-upload">
+                        <div class="image-upload-wrap">
+                            <input class="file-upload-input" id="id_image" type='file' onchange="readURL(this);" accept="image/*" />
+                            <div class="drag-text">
+                                <h3>عکس را بکشید <br>یا ضربه بزنید</h3>
+                            </div>
+                        </div>
+                        <div class="file-upload-content">
+                            <img class="file-upload-image" src="#" alt="your image" />
+                            <div class="image-title-wrap">
+                                <button type="button" onclick="removeUpload()" class="remove-image">X</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-1 mx-auto" >ارسال</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endif %}
+{% endblock %}
+{% block sidebar %}
+    {% if type != 'home' %}
+    <div class="col-2 ms-5 hashtags d-none d-sm-block position-fixed">
+    <p class="p-1">هشتگها</p>
+        <ol style="list-style-type: none;">
+            {% for hashtag in top_hashtags %}
+                <a href="{% url 'hashtags' hashtag.name %}">
+                    <li>#{{ hashtag.name }} <em>{{ hashtag.num_posts }}</em></li>
+                </a>
+            {% endfor %}
+        </ol>
+    </div>
+    {% endif %} 
+{% endblock %}
+
+
+{% block content %}
+    {% if type == 'hashtag' %}
+        <h4>#{{ name }}</h4>
+    {% endif %}
+<div class="row mt-3" id="posts">
+    {% for post in posts %}
+        {% if post.parent %}
+            <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide post' id='post-{{ post.id }}'>
+                <img class="rounded-circle article-img avatar" src="{{ post.profile_img }}" alt="">
+                <h5><a href="{% url 'profile' post.username %}">{{ post.name }}</a></h5>
+                <em dir="ltr"><a href="{% url 'profile' post.username %}">@{{ post.username }}</a></em>
+                <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide' id='post-{{ post.parent.id }}'>
+                    <img class="rounded-circle article-img avatar" src="{{ post.parent.profile_img }}" alt="">
+                    <h5><a href="{% url 'profile' post.parent.username %}">{{ post.parent.name }}</a></h5>
+                    <em dir="ltr"><a href="{% url 'profile' post.parent.username %}">@{{ post.parent.username }}</a></em>
+                    <div class="ms-2 mt-4">
+                        <p>{{ post.parent.content|linebreaks }}</p>
+                    </div>
+                    {% if post.parent.post_img %}
+                        <img src="{{ post.parent.post_img }}" alt="" style="width: inherit; max-height: 300px">
+                    {% endif %}
+                    <a href="{% url 'detail-post' post.parent.id %}" class="next carousel-control-next fa fa-angle-left"></a>
+                </div>
+                <div class="col-12">
+                    <p class='btn-group mt-1'>
+                    <button class='btn btn-primary btn-sm' onclick='handleLikeBtn({{ post.id }})'>
+                        <span class='fa fa-thumbs-up'></span>
+                        <span id='postlike-{{ post.id }}'>{{ post.likes }}</span>
+                    </button>
+                    <button class='btn btn-primary btn-sm' onclick='handleRepublishBtn({{ post.id }})'>
+                        <span class='fa fa-retweet'></span>
+                    </button>
+                    </p>
+                    <a href="{% url 'detail-post' post.id %}" class="next carousel-control-next fa fa-angle-left"></a>
+                </div>
+            </div>
+        {% else %}
+            <div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4 carousel slide post' id='post-{{ post.id }}'>
+                <img class="rounded-circle article-img avatar" src="{{ post.profile_img }}" alt="">
+                <h5><a href="{% url 'profile' post.username %}">{{ post.name }}</a></h5>
+                <em dir="ltr"><a href="{% url 'profile' post.username %}">@{{ post.username }}</a></em>
+                <div class="ms-2 mt-4">
+                    <p>{{ post.content|linebreaks }}</p>
+                </div>
+                {% if post.post_img %}
+                    <img src="{{ post.post_img }}" alt="" style="width: inherit; max-height: 300px">
+                {% endif %}
+                <div class="col-12">
+                    <p class="btn-group mt-1">
+                        <button class='btn btn-primary btn-sm' onclick="handleLikeBtn({{ post.id }})">
+                            <span class="fa fa-thumbs-up"></span>
+                            <span id="postlike-{{ post.id }}">{{ post.likes }}</span>
+                        </button>
+                        <button class='btn btn-primary btn-sm' onclick="handleRepublishBtn({{ post.id }})">
+                            <span class="fa fa-retweet"></span>
+                        </button>
+                    </p>
+                </div>
+                <a href="{% url 'detail-post' post.id %}" class="next carousel-control-next fa fa-angle-left"></a>
+            </div>
+
+        {% endif %}
+    {% endfor %}
+</div>
+{% if type != 'home' %}
+    <div class="navbar-nav pagination mx-auto mb-5">
+        <ul class="mx-auto navbar" style="list-style-type: none;">
+            {% if posts.has_previous %}
+                <li class="page-item"><a href="?page={{ posts.previous_page_number }}" class="page-link">قبلی</a></li>
+            {% else %}
+                <li class="page-item disabled"><a href="#" class="page-link">قبلی</a></li>
+            {% endif %}
+            {% if posts.has_next %}
+                <li class="page-item"><a href="?page={{ posts.next_page_number }}" class="page-link">بعدی</a></li>
+            {% else %}
+                <li class="page-item disabled"><a href="#" class="page-link">بعدی</a></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
+{% endblock content %}
+{% block js %}
+    <script src="/static/js/getCookie.js"></script>
+    <script src="/static/js/postHandler.js"></script>
+{% if type == 'home' %}
+    <script src="/static/js/imageinput.js"></script>
+    <script src="/static/js/handleCreatePost.js"></script>
+    <script src="/static/js/jquery.js"></script>
+{% endif %}
+
+{% endblock js %}
